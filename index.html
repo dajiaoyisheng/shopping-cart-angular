@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="carModule">
+<head>
+    <meta charset="UTF-8">
+    <title>shopCar</title>
+    <link rel="stylesheet" href="bootstrap.css">
+</head>
+<body ng-controller="myCtrl">
+<div class="container">
+    <h3>购物车</h3>
+    <table class="table-bordered table text-center">
+        <tr>
+            <th>全选 <input type="checkbox" ng-model="selectAll" ng-click="all()"></th>
+            <th>商品</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+            <th>操作</th>
+        </tr>
+        <tr ng-repeat="product in products">
+            <td><input type="checkbox" ng-model="product.isSelected" ng-click="one()"></td>
+            <td>{{product.productName}}</td>
+            <td>{{product.price}}</td>
+            <td>
+                <button ng-click="product.count=product.count-1" ng-disabled="product.count==1" class="btn btn-success">
+                    -
+                </button>
+                <input type="text" ng-model="product.count">
+                <button ng-click="product.count=product.count+1" class="btn btn-success">+</button>
+            </td>
+            <td>{{product.count*product.price}}</td>
+            <td>
+                <button class="btn" ng-click="remove(product)">删除</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" class="text-right">
+                总价：{{sum()}}
+            </td>
+        </tr>
+    </table>
+    <form>
+        <div class="form-group">
+            <label for="productName" class="control-label">商品名称</label>
+            <input type="text" id="productName" placeholder="请输入商品名称" ng-model="product.productName">
+        </div>
+
+
+        <div class="form-group">
+            <label for="productPrice" class="control-label">商品价格</label>
+            <input type="text" id="productPrice" placeholder="请输入商品价格" ng-model="product.price">
+        </div>
+        <div class="form-group">
+            <button type="reset" class="btn pull-right" ng-click="reset()">重置</button>
+            <button type="button" class="btn pull-right" style="margin-right: 20px;"
+                    ng-click="addProduct()">添加
+            </button>
+        </div>
+    </form>
+</div>
+<script src="angular.js"></script>
+<script>
+    var app = angular.module('carModule', []);
+    app.controller('myCtrl', ['$scope', function ($scope) {
+        $scope.product = {};
+        $scope.products = [
+            {productName: '篮球', price: 99, count: 1, isSelected: false},
+            {productName: '衣服', price: 30, count: 2, isSelected: false},
+            {productName: '裤子', price: 530, count: 1, isSelected: false}
+        ];
+        $scope.sum = function () {
+            var total = 0;
+            $scope.products.forEach(function (item) {
+                total += item.price * item.count;
+            });
+            return total;
+        };
+        $scope.remove = function (p) {
+            $scope.products = $scope.products.filter(function (item) {
+                return item != p;
+            })
+        };
+        $scope.reset = function () {
+            $scope.product = {};
+        };
+        $scope.all = function () {
+            $scope.products.forEach(function (item) {
+                item.isSelected = $scope.selectAll;
+            })
+        };
+        $scope.one = function () {
+            var item = $scope.products.find(function (item) {
+                return !item.isSelected;
+            });
+            $scope.selectAll = item ? false : true;
+    };
+        $scope.one();
+        $scope.addProduct = function () {
+            if (Object.keys($scope.product).length == 2) {
+                $scope.product.count = 1;
+                $scope.products.push($scope.product);
+                $scope.product = {};
+            }
+        }
+    }])
+</script>
+</body>
+</html>
